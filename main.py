@@ -86,10 +86,13 @@ while machine_on:
 
             # if enough money was paid, deduct ingredients, give change, give drink
             if total >= MENU[beverage]["cost"]:
+                resources["money"] += MENU[beverage]["cost"]
                 process_order(beverage, total)
             # not enough money paid
             else:
                 print("psh! that's not enough money!")
+
+
 
 
 
