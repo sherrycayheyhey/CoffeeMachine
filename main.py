@@ -65,6 +65,7 @@ def process_order(selected_beverage, money_paid):
     # give drink
     print(f"Here's your {selected_beverage} ☕ Enjoy!")
 
+
 machine_on = True
 
 while machine_on:
