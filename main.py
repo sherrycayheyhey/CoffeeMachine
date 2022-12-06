@@ -34,6 +34,15 @@ resources = {
 }
 
 
+def check_resources(selected_beverage):
+    """return True if enough resources, False if not """
+    for ingredient in MENU[selected_beverage]["ingredients"]:
+        if resources[ingredient] < MENU[selected_beverage]["ingredients"][ingredient]:
+            print(f"insufficient {ingredient}")
+            return False
+        return True
+
+
 def payment():
     print("Please insert coins. ")
     quarters = float(input("How many quarters? "))
@@ -44,90 +53,25 @@ def payment():
     return total
 
 
+def process_order(selected_beverage, money_paid):
+    # deduct ingredients
+    for ingredient in MENU[selected_beverage]["ingredients"]:
+        resources[ingredient] -= MENU[selected_beverage]["ingredients"][ingredient]
+
+    # give change
+    change = money_paid - MENU[selected_beverage]["cost"]
+    print(f"Here's {change} in change.")
+
+    # give drink
+    print(f"Here's your {selected_beverage} ☕ Enjoy!")
+
+
 machine_on = True
 
 while machine_on:
     beverage = input("What would you like? (espresso/latte/cappuccino): ")
 
-    if beverage == "espresso":
-        # check resources
-        if resources["water"] < MENU[beverage]["ingredients"]["water"]:
-            print("insufficient water")
-        elif resources["coffee"] < MENU[beverage]["ingredients"]["coffee"]:
-            print("insufficient coffee")
-        # if enough resources, get money
-        else:
-            total = payment()
-            # if enough money was paid, deduct ingredients, give change, give drink
-            if total >= MENU[beverage]["cost"]:
-                # deduct ingredients
-                resources["water"] -= MENU[beverage]["ingredients"]["water"]
-                resources["coffee"] -= MENU[beverage]["ingredients"]["coffee"]
-
-                # give change
-                change = total - MENU[beverage]["cost"]
-                print(f"Here's {change} in change.")
-
-                # give drink
-                print(f"Here's your {beverage} ☕ Enjoy!")
-            # not enough money paid
-            else:
-                print("psh! that's not enough money!")
-    elif beverage == "latte":
-        # check resources
-        if resources["water"] < MENU[beverage]["ingredients"]["water"]:
-            print("insufficient water")
-        elif resources["milk"] < MENU[beverage]["ingredients"]["milk"]:
-            print("insufficient milk")
-        elif resources["coffee"] < MENU[beverage]["ingredients"]["coffee"]:
-            print("insufficient coffee")
-        # if enough resources, get money
-        else:
-            total = payment()
-            # if enough money was paid, deduct ingredients, give change, give drink
-            if total >= MENU[beverage]["cost"]:
-                # deduct ingredients
-                resources["water"] -= MENU[beverage]["ingredients"]["water"]
-                resources["milk"] -= MENU[beverage]["ingredients"]["milk"]
-                resources["coffee"] -= MENU[beverage]["ingredients"]["coffee"]
-
-                # give change
-                change = total - MENU[beverage]["cost"]
-                print(f"Here's {change} in change.")
-
-                # give drink
-                print(f"Here's your {beverage} ☕ Enjoy!")
-            # not enough money paid
-            else:
-                print("psh! that's not enough money!")
-    elif beverage == "cappuccino":
-        # check resources
-        if resources["water"] < MENU[beverage]["ingredients"]["water"]:
-            print("insufficient water 💧")
-        elif resources["milk"] < MENU[beverage]["ingredients"]["milk"]:
-            print("insufficient milk 🥛")
-        elif resources["coffee"] < MENU[beverage]["ingredients"]["coffee"]:
-            print("insufficient coffee")
-        # if enough resources, get money
-        else:
-            total = payment()
-            # if enough money was paid, deduct ingredients, give change, give drink
-            if total >= MENU[beverage]["cost"]:
-                # deduct ingredients
-                resources["water"] -= MENU[beverage]["ingredients"]["water"]
-                resources["milk"] -= MENU[beverage]["ingredients"]["milk"]
-                resources["coffee"] -= MENU[beverage]["ingredients"]["coffee"]
-
-                # give change
-                change = total - MENU[beverage]["cost"]
-                print(f"Here's {change} in change.")
-
-                # give drink
-                print(f"Here's your {beverage} ☕ Enjoy!")
-            # not enough money paid
-            else:
-                print("psh! that's not enough money! 💵 ")
-    elif beverage == "report":
+    if beverage == "report":
         print(f'Water: {resources["water"]}ml')
         print(f'Milk: {resources["milk"]}ml')
         print(f'Coffee: {resources["coffee"]}g')
@@ -135,4 +79,18 @@ while machine_on:
     elif beverage == "off":
         sys.exit("powering down...")
     else:
-        print("that wasn't an option, fool! 🙄")
+        # check resource
+        if check_resources(beverage):
+            # if there's enough resources, process money
+            total = payment()
+
+            # if enough money was paid, deduct ingredients, give change, give drink
+            if total >= MENU[beverage]["cost"]:
+                process_order(beverage, total)
+            # not enough money paid
+            else:
+                print("psh! that's not enough money!")
+
+
+
+
